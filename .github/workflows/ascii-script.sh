@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-sudo apt update
+sudo apt update -y
 sudo apt install cowsay -y
-cowsay -f github "GitHub Action Started" > github.txt
-grep -i "github" github.txt
-cat github.txt
+cowsay -f dragon "dragon Action Started" > dragon.txt
+grep -i "dragon" dragon.txt
+cat dragon.txt
