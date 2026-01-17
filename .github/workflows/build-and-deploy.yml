@@ -1,0 +1,15 @@
+name: Build and Deploy Pipeline
+on: 
+    push:
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps: 
+          - name: Checkout the git repo
+            uses: actions/checkout@v4
+          - name: Excuating script file 
+            run: |
+             chmod +x .github/workflows/ascii-script.sh    
+             ./.github/workflows/ascii-script.sh
+
+         
