@@ -2,57 +2,23 @@ name: Build and Deploy Pipeline
 on: 
     push:
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps: 
-          - name: Checkout the git repo
-            uses: actions/checkout@v4
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+     - name: docker build 
+       run: echo docker build -t ${{ vars.CONTAINER_REGISTRY }}/${{ vars.DOCKER_USERNAME }}/${{ vars.IMAGE_NAME}}:latest .
+     - name: docker login 
+       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ vars.CONTAINER_REGISTRY }} --username ${{ vars.DOCKER_USERNAME }} --password-stdin
+     - name: docker publish
+       run: echo docker push ${{ vars.CONTAINER_REGISTRY }}/${{ vars.DOCKER_USERNAME }}/${{ vars.IMAGE_NAME }}:latest
+  docker-test:
+    concurrency:
+        group: docker-uat
+        cancel-in-progress: true
+    runs-on: ubuntu-latest
+    steps:
+        - name: gather OS version
+          run: cat /etc/os-release
 
-          - name: print and read file 
-            run: |
-              echo "This is my first github action workflow..!"
-              ls -lrth 
-              cat README.md
-
-          - name: Install cowsay program
-            run: |
-                sudo apt update -y  
-                sudo apt install cowsay -y 
-
-          - name: Generate ASCII artwork
-            run: cowsay -f dragon "dragon Action Started" >> dragon.txt
-
-          - name: upload the dragon.txt file 
-            uses: actions/upload-artifact@v4
-            with:
-                name: dragon-file
-                path: ./dragon.txt
-          - name: Sleep for 30 sec
-            run: sleep 30 
-    test:
-        needs: build
-        runs-on: ubuntu-latest
-        steps:
-          - name: download the dragon.txt file 
-            uses: actions/download-artifact@v4
-            with:
-                name: dragon-file
-
-          - name: Sleep for 30 sec
-            run: sleep 30
-    deploy:
-        needs: [ build, test ]
-        runs-on: ubuntu-latest
-        steps: 
-          - name: download the dragon.txt file 
-            uses: actions/download-artifact@v4
-            with:
-                name: dragon-file 
-                
-          - name: dragon file exists 
-            run: grep -i "dragon" dragon.txt
-
-          - name: read file 
-            run: cat dragon.txt
+    
         
-          
